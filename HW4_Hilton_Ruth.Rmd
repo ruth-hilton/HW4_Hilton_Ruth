@@ -1,0 +1,79 @@
+---
+title: "HW4_Hilton_Ruth"
+author: "Ruth Hilton"
+output: html_document
+knit: (function(input_file, encoding) {
+  out_dir <- 'docs';
+  rmarkdown::render(input_file,
+ encoding=encoding,
+ output_file=file.path(dirname(input_file), out_dir, 'index.html'))})
+---
+
+## Table Assignment
+
+### Rationale and Explanation
+ 
+For this table assignment, I am continuing to work with the International Mathematics Olympiad (IMO) data set that I began working with on HW2 and 3. One data set shows the name, countries, scores and ranks of all IMO winners from 1984-2017 and was downloaded from Kaggle.com, while the other data set contains full country results from 1959 to present scraped from imo-official.com. In these tables, I would like to display the full summary results for each individual (grouped by country, with USA and Germany again highlighted, from 1984-2017) and summary results for all countries that have participated (1959-present). This will convey more specific results information per person and will allow people to see multiple participants and their best results if they participated multiple years. It also will show much more information on each country's participation than was possible to portray in last week's choropleth map. 
+
+```{r message = F}
+#load libraries
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(reactable)
+#load data 
+imo.individual <- read.csv("imo_results.csv")
+imo.country <- read.csv("imo_full_by_country.csv")
+```
+
+In this table, I displayed the full individual results and added `reactable` functionality to allow the user to sort the data by each of the columns and filter by a value in each column. I made these choices to allow the user to sort through the large quantity of data more effectively. I re-labeled the column names and used left-align for all columns to help with readability. I also added a row highlight hover that allows the viewer to more clearly follow data along individual rows. 
+
+### Table 1: Individual Results (1984-2017)
+```{r}
+ind.tbl <- imo.individual %>%
+  select(country, year, firstname, lastname, total, rank, award) %>%
+  reactable(columns = list(
+    country = colDef(name = "Country Code", align = "left"),
+    year = colDef(name = "Year", align = "left"),
+    firstname = colDef(name = "First Name", align = "left"),
+    lastname = colDef(name = "Last Name", align = "left"),
+    total = colDef(name = "Total Score (out of 42)", align = "left"),
+    rank = colDef(name = "Final Ranking", align = "left"),
+    award = colDef(name = "Medal Awarded", align = "left")
+  ),
+  filterable = TRUE,
+  highlight = TRUE,
+  defaultSorted="year")
+ind.tbl
+```
+
+This table shows the country participation summaries of the entire history of the IMO competition. Its default is sorting by "Gold Medals Won" and has descending as default for viewers to easily see the dominant countries in that regard. (Note: Medals are awarded to the highest ranked participants, and slightly fewer than half receive a medal. Gold, silver and bronze medals awarded are approximately in the ratios 1:2:3.) I added similar functionality to this table as before, but changed the formatting slightly to outline the full table and make the font more readable sans serif and a new color for added interest.
+
+### Table 2: Country Results (1959-present)
+```{r}
+country.tbl <- imo.country %>%
+  select(country, firstyear, yearsparticipated, participants, gold, silver, bronze) %>%
+  reactable(
+    columns = list(
+    country = colDef(name = "Country (or Region)", align = "center"),
+    firstyear = colDef(name = "First Year Participated", align = "center"),
+    yearsparticipated = colDef(name = "Total Years Participated", align = "center"),
+    participants = colDef(name = "Total Participants", align = "center"),
+    gold = colDef(name = "Gold Medals Won", align = "center"),
+    silver = colDef(name = "Silver Medals Won", align = "center"),
+    bronze = colDef(name = "Bronze Medals Won", align = "center")
+    ),
+  defaultSortOrder = "desc",
+  defaultSorted = c("gold", "silver", "bronze"),
+  highlight = TRUE,
+  outlined = TRUE,
+  style = list(fontFamily = "Work Sans, sans-serif", fontSize = "14px", color ="#2c5e77")
+  )
+country.tbl
+```
+
+*Sources: https://www.imo-official.org/results_country.aspx and https://www.kaggle.com/luckyt/imo-scores*
+
+
+
+
